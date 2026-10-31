@@ -1,6 +1,6 @@
 # Deploy and Host Excalidraw Plus Community with Railway
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/LhE3_6?referralCode=1uJ_oA)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/excalidraw-plus-community?referralCode=1uJ_oA)
 
 > **Community version.** This is an independent, community-built project inspired by Excalidraw+. It is not affiliated with, endorsed by or supported by Excalidraw. If you need a robust, secure product with compliance such as SOC 2, we recommend the official [Excalidraw+](https://plus.excalidraw.com).
 
