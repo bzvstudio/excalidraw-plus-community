@@ -11,6 +11,9 @@ dist-ssr/
 .env
 .env.local
 
+# conductor
+.conductor/settings.local.toml
+
 # logs
 *.log
 npm-debug.log*
