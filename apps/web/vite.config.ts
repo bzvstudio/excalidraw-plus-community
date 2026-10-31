@@ -8,11 +8,12 @@ import { preloadInterfaceFont } from './vite/preload-interface-font.ts'
 import { selfHostedEditorFonts } from './vite/self-hosted-editor-fonts.ts'
 import { defineConfig } from 'vitest/config'
 
-const WEB_PORT = 5176
+// Overridable so several checkouts can run at once; see .conductor/workspace.sh.
+const WEB_PORT = Number(process.env.WEB_PORT ?? 5176)
 
 const EDITOR_DIST = 'node_modules/@excalidraw/excalidraw/dist/prod'
 
-const API_ORIGIN = `http://localhost:${DEFAULT_API_PORT}`
+const API_ORIGIN = `http://localhost:${process.env.PORT ?? DEFAULT_API_PORT}`
 
 export default defineConfig({
   plugins: [

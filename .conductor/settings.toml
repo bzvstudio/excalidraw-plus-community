@@ -1,0 +1,12 @@
+"$schema" = "https://conductor.build/schemas/settings.repo.schema.json"
+
+[scripts]
+setup = "bash .conductor/workspace.sh setup"
+archive = "bash .conductor/workspace.sh archive"
+run_mode = "concurrent"
+
+[scripts.run.dev]
+command = "bash .conductor/workspace.sh run"
+default = true
+icon = "play"
+available_in = "local"
