@@ -1,0 +1,20 @@
+.library-browsing-off .library-menu-browse-button {
+  display: none;
+}
+
+.embedded .main-menu-trigger,
+.embedded .help-icon {
+  display: none;
+}
+
+.own-people .UserList {
+  display: none;
+}
+
+.read-only .disable-view-mode {
+  display: none;
+}
+
+.excalidraw {
+  font-feature-settings: normal;
+}

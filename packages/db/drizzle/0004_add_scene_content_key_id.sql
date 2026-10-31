@@ -1,0 +1,1 @@
+ALTER TABLE "scenes" ADD COLUMN "content_key_id" text;

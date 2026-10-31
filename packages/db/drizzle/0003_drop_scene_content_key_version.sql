@@ -1,0 +1,1 @@
+ALTER TABLE "scenes" DROP COLUMN "content_key_version";

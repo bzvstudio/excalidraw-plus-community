@@ -1,0 +1,188 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1792877821325,
+      "tag": "0000_add_accounts_and_instance",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792878742529,
+      "tag": "0001_add_workspaces_and_invites",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792882078072,
+      "tag": "0002_add_scenes",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792883079931,
+      "tag": "0003_drop_scene_content_key_version",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792883080175,
+      "tag": "0004_add_scene_content_key_id",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792884183428,
+      "tag": "0005_add_scene_files",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792885584945,
+      "tag": "0006_add_collections_and_thumbnails",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792886845930,
+      "tag": "0007_share_existing_scenes",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792887126496,
+      "tag": "0008_add_teams",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792887924249,
+      "tag": "0009_allow_repeated_collection_names",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792888888811,
+      "tag": "0010_add_libraries",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1792889644008,
+      "tag": "0011_add_share_links",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792897883562,
+      "tag": "0012_add_comments",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792901712809,
+      "tag": "0013_add_ai_usage_and_workspace_keys",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1792904689801,
+      "tag": "0014_add_api_keys",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1792910807768,
+      "tag": "0015_add_audit_events",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1792919942231,
+      "tag": "0016_clear_provider_tokens",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1793011729675,
+      "tag": "0017_add_workspace_removals",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1793037224339,
+      "tag": "0018_add_invite_accepted_at",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1793039585669,
+      "tag": "0019_invite_max_uses",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1793039585917,
+      "tag": "0020_drop_invite_accepted_at",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1793115513958,
+      "tag": "0021_reserve_workspace_slugs",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1793197278289,
+      "tag": "0022_add_user_avatars",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1793197459009,
+      "tag": "0023_reserve_avatars_slug",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1793201591049,
+      "tag": "0024_give_avatars_an_id",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1793208214257,
+      "tag": "0025_give_workspaces_a_photo",
+      "breakpoints": true
+    }
+  ]
+}
