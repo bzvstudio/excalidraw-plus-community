@@ -1,12 +1,12 @@
-# Deploy and Host Excalidraw Plus Community with Railway
+# Deploy and Host Excalidraw Plus Community Edition with Railway
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/excalidraw-plus-community?referralCode=1uJ_oA)
 
-> **Community version.** This is an independent, community-built project inspired by Excalidraw+. It is not affiliated with, endorsed by or supported by Excalidraw. If you need a robust, secure product with compliance such as SOC 2, we recommend the official [Excalidraw+](https://plus.excalidraw.com).
+> **Community Edition.** This is an independent, community-built project inspired by Excalidraw+. It is not affiliated with, endorsed by or supported by Excalidraw. If you need a robust, secure product with compliance such as SOC 2, we recommend the official [Excalidraw+](https://plus.excalidraw.com).
 
-Excalidraw Plus Community is a self-hosted team workspace around the open-source Excalidraw editor. Your team gets accounts, shared workspaces, live collaboration, comments, presentations and share links, with drawings stored and encrypted in your own Railway project. An API and an MCP server connect it to scripts and AI agents.
+Excalidraw Plus Community Edition is a self-hosted team workspace around the open-source Excalidraw editor. Your team gets accounts, shared workspaces, live collaboration, comments, presentations and share links, with drawings stored and encrypted in your own Railway project. An API and an MCP server connect it to scripts and AI agents.
 
-## About Hosting Excalidraw Plus Community
+## About Hosting Excalidraw Plus Community Edition
 
 Hosting it means running one app service, a Postgres database and an S3-compatible bucket. The template creates and connects all three, generates the secrets for your deployment, and gives the app a public domain. The app applies its database migrations whenever it starts.
 
@@ -27,7 +27,7 @@ Keep `ENCRYPTION_KEY` safe and never change it directly. It is the only way to r
 - Creating and updating diagrams from scripts and AI agents through the REST API and MCP server
 - Keeping drawings on infrastructure you control, encrypted at rest
 
-## Dependencies for Excalidraw Plus Community Hosting
+## Dependencies for Excalidraw Plus Community Edition Hosting
 
 - **Postgres**: workspaces, scenes and comments
 - **S3-compatible bucket**: images placed in scenes, and scene thumbnails
@@ -69,6 +69,6 @@ For sign-in providers, register `<your domain>/auth/callback/<google|github|micr
 
 **Security and license.** Report vulnerabilities privately, as described in [SECURITY.md](https://github.com/bzvstudio/excalidraw-plus-community/blob/main/SECURITY.md). This project is MIT-licensed. The embedded Excalidraw editor is MIT-licensed too, with its notice in [THIRD_PARTY_NOTICES.md](https://github.com/bzvstudio/excalidraw-plus-community/blob/main/THIRD_PARTY_NOTICES.md). The Excalidraw name and logo belong to their owners.
 
-## Why Deploy Excalidraw Plus Community on Railway?
+## Why Deploy Excalidraw Plus Community Edition on Railway?
 
 One click gives you the app, its database and its bucket, already connected, with secrets generated and nothing to fill in. Railway handles TLS, the public domain, health checks and restarts, and a redeploy saves open scenes before the old version stops. You pay for what the service uses, and your team's drawings stay in your own project.

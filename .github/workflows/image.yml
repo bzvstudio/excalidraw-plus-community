@@ -42,7 +42,7 @@ jobs:
         with:
           context: .
           load: true
-          tags: excalidraw-plus-community:ci
+          tags: excalidraw-plus-community-edition:ci
           cache-from: type=gha,scope=${{ runner.arch }}
           cache-to: type=gha,scope=${{ runner.arch }},mode=max
       - name: Install Trivy, verified against its pinned checksum
@@ -55,13 +55,13 @@ jobs:
           tar -xzf trivy.tar.gz trivy
           sudo mv trivy /usr/local/bin/trivy
       - name: Refuse critical vulnerabilities in the image
-        run: trivy image --exit-code 1 --severity CRITICAL --ignore-unfixed --no-progress excalidraw-plus-community:ci
+        run: trivy image --exit-code 1 --severity CRITICAL --ignore-unfixed --no-progress excalidraw-plus-community-edition:ci
       - name: Refuse critical vulnerabilities in the bundled dependencies
         if: runner.arch == 'X64'
         run: trivy fs --exit-code 1 --severity CRITICAL --ignore-unfixed --scanners vuln --no-progress pnpm-lock.yaml
       - name: Run the image the way a deployment does
         if: hashFiles('e2e/image-smoke.ts') != ''
-        run: node e2e/image-smoke.ts excalidraw-plus-community:ci
+        run: node e2e/image-smoke.ts excalidraw-plus-community-edition:ci
 
   publish:
     if: startsWith(github.ref, 'refs/tags/v')
