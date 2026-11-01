@@ -42,7 +42,7 @@ export function CollectionsNav({
   const listId = useId()
 
   return (
-    <nav aria-label="Collections" className="flex min-h-0 flex-col">
+    <nav aria-label="Collections" className={cn('flex min-h-0 flex-col', open && 'min-h-24')}>
       <div className="group/heading flex h-8 shrink-0 items-center gap-1">
         <button
           type="button"

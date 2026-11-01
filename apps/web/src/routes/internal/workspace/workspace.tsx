@@ -202,6 +202,8 @@ function WorkspaceShell() {
     >
       <WorkspaceNav
         workspaceSlug={slug}
+        isAdmin={canManageWorkspace(workspace.role)}
+        currentSettingsPage={settingsPlace?.page.id}
         collections={collections}
         collectionActions={collectionActions}
         collectionsOpen={collectionsOpen}

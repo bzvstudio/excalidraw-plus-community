@@ -1,23 +1,15 @@
 import { ActivityIcon } from '@animateicons/react/lucide/activity-icon'
 import { ArrowRightLeftIcon } from '@animateicons/react/lucide/arrow-right-left-icon'
-import { Building2Icon } from '@animateicons/react/lucide/building-2-icon'
 import { FileTextIcon } from '@animateicons/react/lucide/file-text-icon'
 import { FolderIcon } from '@animateicons/react/lucide/folder-icon'
 import { FolderPlusIcon } from '@animateicons/react/lucide/folder-plus-icon'
 import { HouseIcon } from '@animateicons/react/lucide/house-icon'
-import { KeyRoundIcon } from '@animateicons/react/lucide/key-round-icon'
 import { MonitorIcon } from '@animateicons/react/lucide/monitor-icon'
 import { MoonIcon } from '@animateicons/react/lucide/moon-icon'
 import { PlusIcon } from '@animateicons/react/lucide/plus-icon'
-import { ScrollTextIcon } from '@animateicons/react/lucide/scroll-text-icon'
-import { SlidersHorizontalIcon } from '@animateicons/react/lucide/sliders-horizontal-icon'
-import { SparklesIcon } from '@animateicons/react/lucide/sparkles-icon'
 import { SunIcon } from '@animateicons/react/lucide/sun-icon'
 import { UploadIcon } from '@animateicons/react/lucide/upload-icon'
 import { UserPlusIcon } from '@animateicons/react/lucide/user-plus-icon'
-import { UserRoundIcon } from '@animateicons/react/lucide/user-round-icon'
-import { UsersIcon } from '@animateicons/react/lucide/users-icon'
-import { UsersRoundIcon } from '@animateicons/react/lucide/users-round-icon'
 import { Autocomplete } from '@base-ui/react/autocomplete'
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -36,7 +28,7 @@ import {
   PALETTE_SCENES_SHOWN,
   PALETTE_SEARCH_DELAY_MS,
 } from '@/constants/command-palette'
-import type { SettingsPageId } from '@/constants/settings'
+import { SETTINGS_ICONS } from '@/constants/settings-icons'
 import { placeNameOf } from '@/helpers/activity'
 import {
   type PaletteActionId,
@@ -65,17 +57,6 @@ import type { Collection, SceneListItem } from '@/types/api'
 type Run = (item: PaletteItem, inNewTab: boolean) => void
 
 const PAGE_ICONS: Record<PalettePage, AnimatableIcon> = { home: HouseIcon, drafts: FileTextIcon, activity: ActivityIcon }
-
-const SETTINGS_PAGE_ICONS: Record<SettingsPageId, AnimatableIcon> = {
-  general: SlidersHorizontalIcon,
-  members: UsersRoundIcon,
-  teams: UsersIcon,
-  ai: SparklesIcon,
-  'api-keys': KeyRoundIcon,
-  'audit-log': ScrollTextIcon,
-  account: UserRoundIcon,
-  'account-workspaces': Building2Icon,
-}
 
 const ACTION_ICONS: Record<PaletteActionId, AnimatableIcon> = {
   'new-scene': PlusIcon,
@@ -354,7 +335,7 @@ function SceneRow({ scene, workspaceId, placeName }: { scene: SceneListItem; wor
 function commandIcon(item: PaletteCommand): AnimatableIcon {
   switch (item.kind) {
     case 'go':
-      return 'settings' in item.destination ? SETTINGS_PAGE_ICONS[item.destination.settings] : PAGE_ICONS[item.destination.page]
+      return 'settings' in item.destination ? SETTINGS_ICONS[item.destination.settings] : PAGE_ICONS[item.destination.page]
     case 'action':
       return ACTION_ICONS[item.action]
     case 'theme':
