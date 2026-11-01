@@ -19,7 +19,7 @@ export function SignInRoute() {
   useEffect(() => {
     if (error) dropCarriedInvite()
   }, [error])
-  const { productName, signUpMode, emailEnabled, signInOptions } = useRuntimeConfig()
+  const { signUpMode, emailEnabled, signInOptions } = useRuntimeConfig()
 
   const submit = async (values: SignInValues) => {
     const result = await signIn(values)
@@ -29,7 +29,6 @@ export function SignInRoute() {
 
   return (
     <SignInPage
-      productName={productName}
       onSubmit={submit}
       providerError={providerErrorMessage(error)}
       providers={
@@ -62,14 +61,12 @@ export function SignInRoute() {
 }
 
 export function SignInPage({
-  productName,
   onSubmit,
   footer,
   providers,
   providerError,
   forgotPassword,
 }: {
-  productName: string
   onSubmit: (values: SignInValues) => Promise<SubmitResult>
   footer?: ReactNode
   providers?: ReactNode
@@ -79,12 +76,7 @@ export function SignInPage({
   const { register, errors, isSubmitting, error, submit } = useFormSubmission(signInSchema, onSubmit)
 
   return (
-    <AuthCard
-      title={`Sign in to ${productName}`}
-      description="Pick up where you left off."
-      error={error ?? providerError}
-      footer={footer}
-    >
+    <AuthCard title="Sign in" align="start" error={error ?? providerError} footer={footer}>
       {providers}
       <form onSubmit={submit} noValidate className="flex flex-col gap-4">
         <TextField id="email" label="Email" type="email" autoComplete="email" registration={register('email')} error={errors.email} />
