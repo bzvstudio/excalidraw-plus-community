@@ -1,27 +1,32 @@
+import { ActivityIcon } from '@animateicons/react/lucide/activity-icon'
+import { ArrowRightLeftIcon } from '@animateicons/react/lucide/arrow-right-left-icon'
+import { Building2Icon } from '@animateicons/react/lucide/building-2-icon'
+import { FileTextIcon } from '@animateicons/react/lucide/file-text-icon'
+import { FolderIcon } from '@animateicons/react/lucide/folder-icon'
+import { FolderPlusIcon } from '@animateicons/react/lucide/folder-plus-icon'
+import { HouseIcon } from '@animateicons/react/lucide/house-icon'
+import { KeyRoundIcon } from '@animateicons/react/lucide/key-round-icon'
+import { MonitorIcon } from '@animateicons/react/lucide/monitor-icon'
+import { MoonIcon } from '@animateicons/react/lucide/moon-icon'
+import { PlusIcon } from '@animateicons/react/lucide/plus-icon'
+import { ScrollTextIcon } from '@animateicons/react/lucide/scroll-text-icon'
+import { SlidersHorizontalIcon } from '@animateicons/react/lucide/sliders-horizontal-icon'
+import { SparklesIcon } from '@animateicons/react/lucide/sparkles-icon'
+import { SunIcon } from '@animateicons/react/lucide/sun-icon'
+import { UploadIcon } from '@animateicons/react/lucide/upload-icon'
+import { UserPlusIcon } from '@animateicons/react/lucide/user-plus-icon'
+import { UserRoundIcon } from '@animateicons/react/lucide/user-round-icon'
+import { UsersIcon } from '@animateicons/react/lucide/users-icon'
+import { UsersRoundIcon } from '@animateicons/react/lucide/users-round-icon'
 import { Autocomplete } from '@base-ui/react/autocomplete'
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useRouter } from '@tanstack/react-router'
 import { SCENE_TITLE_MAX_LENGTH } from '@repo/api/scenes.const'
-import {
-  ActivityIcon,
-  ArrowRightLeftIcon,
-  FileTextIcon,
-  FolderIcon,
-  FolderPlusIcon,
-  HouseIcon,
-  LoaderCircleIcon,
-  MonitorIcon,
-  MoonIcon,
-  PlusIcon,
-  SearchIcon,
-  SunIcon,
-  UploadIcon,
-  UserPlusIcon,
-  UsersIcon,
-} from 'lucide-react'
-import { type ComponentType, type KeyboardEvent, memo, useEffect, useId, useMemo, useRef, useState } from 'react'
+import { LoaderCircleIcon, SearchIcon, UsersIcon as KeptToTeamsIcon } from 'lucide-react'
+import { type KeyboardEvent, memo, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { SceneThumbnail } from '@/components/scenes/scene-card'
+import { type AnimatableIcon, AnimatedIcon } from '@/components/ui/animated-icon'
 import { DialogOverlay, DialogPortal } from '@/components/ui/dialog'
 import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import {
@@ -31,7 +36,7 @@ import {
   PALETTE_SCENES_SHOWN,
   PALETTE_SEARCH_DELAY_MS,
 } from '@/constants/command-palette'
-import { SETTINGS_ICONS } from '@/constants/settings-icons'
+import type { SettingsPageId } from '@/constants/settings'
 import { placeNameOf } from '@/helpers/activity'
 import {
   type PaletteActionId,
@@ -46,7 +51,7 @@ import {
   paletteTarget,
 } from '@/helpers/command-palette'
 import { jumpBackIn } from '@/helpers/home'
-import { IS_MAC, chord } from '@/helpers/platform'
+import { chord } from '@/helpers/platform'
 import { recentVisits } from '@/helpers/recent-visits'
 import { timeAgo } from '@/helpers/time'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
@@ -57,24 +62,31 @@ import { thumbnailUrl } from '@/services/thumbnails/thumbnails'
 import { trpc } from '@/trpc'
 import type { Collection, SceneListItem } from '@/types/api'
 
-type Icon = ComponentType<{ className?: string; 'aria-hidden'?: boolean }>
-
 type Run = (item: PaletteItem, inNewTab: boolean) => void
 
-const PAGE_ICONS: Record<PalettePage, Icon> = { home: HouseIcon, drafts: FileTextIcon, activity: ActivityIcon }
+const PAGE_ICONS: Record<PalettePage, AnimatableIcon> = { home: HouseIcon, drafts: FileTextIcon, activity: ActivityIcon }
 
-const ACTION_ICONS: Record<PaletteActionId, Icon> = {
+const SETTINGS_PAGE_ICONS: Record<SettingsPageId, AnimatableIcon> = {
+  general: SlidersHorizontalIcon,
+  members: UsersRoundIcon,
+  teams: UsersIcon,
+  ai: SparklesIcon,
+  'api-keys': KeyRoundIcon,
+  'audit-log': ScrollTextIcon,
+  account: UserRoundIcon,
+  'account-workspaces': Building2Icon,
+}
+
+const ACTION_ICONS: Record<PaletteActionId, AnimatableIcon> = {
   'new-scene': PlusIcon,
   'new-collection': FolderPlusIcon,
   import: UploadIcon,
   invite: UserPlusIcon,
 }
 
-const THEME_ICONS: Record<ThemePreference, Icon> = { light: SunIcon, dark: MoonIcon, system: MonitorIcon }
+const THEME_ICONS: Record<ThemePreference, AnimatableIcon> = { light: SunIcon, dark: MoonIcon, system: MonitorIcon }
 
 const NO_SCENES: SceneListItem[] = []
-
-const NEW_SCENE_KEYS = IS_MAC ? '⌥A' : 'Alt A'
 
 const MOVE_KEYS = ['↑', '↓']
 const OPEN_KEYS = ['↵']
@@ -257,13 +269,17 @@ function PaletteBody({
                       'group/item flex min-h-10 cursor-default items-center gap-3 rounded-lg px-2 py-1.5 text-foreground outline-none select-none [scroll-margin-block:0.5rem] data-highlighted:bg-accent',
                       item.kind === 'scene' && pending && 'opacity-60',
                     )}
-                  >
-                    <ItemContent
-                      item={item}
-                      workspaceId={workspaceId}
-                      placeName={item.kind === 'scene' ? placeNameOf(item.scene, collectionNames, userId) : undefined}
-                    />
-                  </Autocomplete.Item>
+                    render={(props, { highlighted }) => (
+                      <div {...props}>
+                        <ItemContent
+                          item={item}
+                          highlighted={highlighted}
+                          workspaceId={workspaceId}
+                          placeName={item.kind === 'scene' ? placeNameOf(item.scene, collectionNames, userId) : undefined}
+                        />
+                      </div>
+                    )}
+                  />
                 )}
               </Autocomplete.Collection>
             </Autocomplete.Group>
@@ -279,18 +295,28 @@ function PaletteBody({
   )
 }
 
-function ItemContent({ item, workspaceId, placeName }: { item: PaletteItem; workspaceId: string; placeName?: string }) {
+function ItemContent({
+  item,
+  highlighted,
+  workspaceId,
+  placeName,
+}: {
+  item: PaletteItem
+  highlighted: boolean
+  workspaceId: string
+  placeName?: string
+}) {
   switch (item.kind) {
     case 'scene':
       return <SceneRow scene={item.scene} workspaceId={workspaceId} placeName={placeName} />
     case 'collection':
       return (
         <>
-          <IconTile icon={FolderIcon} />
+          <IconTile icon={FolderIcon} active={highlighted} />
           <span className="min-w-0 flex-1 truncate">{item.label}</span>
           {item.collection.teamIds.length > 0 && (
             <>
-              <UsersIcon aria-hidden className="size-3.5 shrink-0 text-muted-foreground" />
+              <KeptToTeamsIcon aria-hidden className="size-3.5 shrink-0 text-muted-foreground" />
               <span className="sr-only">, kept to teams</span>
             </>
           )}
@@ -299,14 +325,9 @@ function ItemContent({ item, workspaceId, placeName }: { item: PaletteItem; work
     default:
       return (
         <>
-          <IconTile icon={commandIcon(item)} />
+          <IconTile icon={commandIcon(item)} active={highlighted} />
           <span className="min-w-0 flex-1 truncate">{item.label}</span>
           {item.detail && <span className="shrink-0 truncate text-xs text-muted-foreground">{item.detail}</span>}
-          {item.kind === 'action' && item.action === 'new-scene' && (
-            <Kbd aria-hidden className="max-sm:hidden [@media(pointer:coarse)]:hidden">
-              {NEW_SCENE_KEYS}
-            </Kbd>
-          )}
         </>
       )
   }
@@ -330,10 +351,10 @@ function SceneRow({ scene, workspaceId, placeName }: { scene: SceneListItem; wor
   )
 }
 
-function commandIcon(item: PaletteCommand): Icon {
+function commandIcon(item: PaletteCommand): AnimatableIcon {
   switch (item.kind) {
     case 'go':
-      return 'settings' in item.destination ? SETTINGS_ICONS[item.destination.settings] : PAGE_ICONS[item.destination.page]
+      return 'settings' in item.destination ? SETTINGS_PAGE_ICONS[item.destination.settings] : PAGE_ICONS[item.destination.page]
     case 'action':
       return ACTION_ICONS[item.action]
     case 'theme':
@@ -343,10 +364,10 @@ function commandIcon(item: PaletteCommand): Icon {
   }
 }
 
-function IconTile({ icon: Icon }: { icon: Icon }) {
+function IconTile({ icon, active }: { icon: AnimatableIcon; active: boolean }) {
   return (
     <span className="flex size-7 shrink-0 items-center justify-center rounded-md border bg-background text-muted-foreground group-data-highlighted/item:text-foreground">
-      <Icon aria-hidden className="size-4" />
+      <AnimatedIcon icon={icon} active={active} />
     </span>
   )
 }

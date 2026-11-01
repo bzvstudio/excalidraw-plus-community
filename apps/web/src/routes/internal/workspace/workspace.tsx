@@ -22,7 +22,6 @@ import { canEditScenes, canManageCollections, canManageWorkspace } from '@/helpe
 import { newScenePlace } from '@/helpers/new-scene'
 import { searchShortcut, togglesSidebar } from '@/helpers/shortcuts'
 import { useImportScenes } from '@/hooks/use-import-scenes'
-import { useNewSceneShortcut } from '@/hooks/use-new-scene-shortcut'
 import {
   SIDEBAR_MENU_SELECTOR,
   SIDEBAR_SHEET_SELECTOR,
@@ -143,7 +142,6 @@ function WorkspaceShell() {
   const newScene = useCallback(() => void createSceneIn(place), [createSceneIn, place])
 
   const canCreateScene = canEditScenes(workspace.role)
-  useNewSceneShortcut(canCreateScene && !onScene ? newScene : undefined)
 
   const placeName = place === undefined ? 'Drafts' : (collections.find(({ id }) => id === place)?.name ?? 'this collection')
   const { importFiles } = useImportScenes({
