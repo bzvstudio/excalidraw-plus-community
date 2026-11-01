@@ -73,6 +73,10 @@ export const SETUP_CODE_GROUP_LENGTH = 4;
 
 export const SETUP_PATH = "/setup";
 
+export const SETUP_CODE_CHECK_PATH = "/setup-code/check";
+
+export const SETUP_CODE_CHECKS_PER_MINUTE = 10;
+
 export const SIGN_IN_PATH = "/sign-in";
 
 export const RESET_PASSWORD_PATH = "/reset-password";

@@ -66,6 +66,8 @@ export type WorkspacesService = {
   listMembers: (actor: Membership) => Promise<WorkspaceMember[]>;
   changeRole: (actor: Membership, userId: string, role: WorkspaceRole, revokeKeyIds?: readonly string[]) => Promise<void>;
   removeMember: (actor: Membership, userId: string, revokeKeyIds?: readonly string[]) => Promise<void>;
+  leave: (actor: Membership, departure: { transferTo?: string; revokeKeyIds?: readonly string[] }) => Promise<void>;
+  delete: (actor: Membership) => Promise<void>;
   listRemoved: (actor: Membership) => Promise<RemovedMember[]>;
   readmit: (actor: Membership, userId: string) => Promise<void>;
   createInvite: (

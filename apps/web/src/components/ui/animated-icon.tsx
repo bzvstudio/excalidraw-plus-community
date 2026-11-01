@@ -4,13 +4,37 @@ import { cn } from '@/lib/utils'
 
 const ROW_SELECTOR = 'a, button, [role^="menuitem"]'
 
-type AnimatableIcon = ComponentType<{ ref?: Ref<IconHandle>; size?: number }>
+export type AnimatableIcon = ComponentType<{ ref?: Ref<IconHandle>; size?: number }>
 
-export function AnimatedIcon({ icon: Icon, size = 16, className }: { icon: AnimatableIcon; size?: number; className?: string }) {
+export function AnimatedIcon({
+  icon: Icon,
+  size = 16,
+  className,
+  active,
+}: {
+  icon: AnimatableIcon
+  size?: number
+  className?: string
+  active?: boolean
+}) {
   const icon = useRef<IconHandle>(null)
   const anchor = useRef<HTMLSpanElement>(null)
+  const animating = useRef(false)
+  const controlled = active !== undefined
 
   useEffect(() => {
+    if (active === undefined || active === animating.current) return
+    animating.current = active
+    if (active) icon.current?.startAnimation()
+    else icon.current?.stopAnimation()
+  }, [active])
+
+  useEffect(() => {
+    if (animating.current) icon.current?.startAnimation()
+  }, [Icon])
+
+  useEffect(() => {
+    if (controlled) return
     const row = anchor.current?.closest<HTMLElement>(ROW_SELECTOR)
     if (!row) return
     let hovered = false
@@ -20,6 +44,7 @@ export function AnimatedIcon({ icon: Icon, size = 16, className }: { icon: Anima
       hovered = nextHovered
       focused = nextFocused
       const active = hovered || focused
+      animating.current = active
       if (active && !wasActive) icon.current?.startAnimation()
       if (!active && wasActive) icon.current?.stopAnimation()
     }
@@ -37,7 +62,7 @@ export function AnimatedIcon({ icon: Icon, size = 16, className }: { icon: Anima
       row.removeEventListener('focusin', focus)
       row.removeEventListener('focusout', blur)
     }
-  }, [])
+  }, [controlled])
 
   return (
     <span ref={anchor} aria-hidden className={cn('inline-flex shrink-0', className)}>
