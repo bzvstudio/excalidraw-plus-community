@@ -37,7 +37,7 @@ Keep `ENCRYPTION_KEY` safe and never change it directly. It is the only way to r
 
 ### Deployment Dependencies
 
-- [Source code](https://github.com/bzvstudio/excalidraw-plus-community)
+- [Source code](https://github.com/bzvstudio/excalidraw-plus-community-edition)
 - [Excalidraw](https://github.com/excalidraw/excalidraw), the open-source editor
 - [Railway Storage Buckets](https://docs.railway.com/storage-buckets)
 - [LiveKit](https://livekit.io)
@@ -57,7 +57,7 @@ Keep `ENCRYPTION_KEY` safe and never change it directly. It is the only way to r
 | Calls | `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET` |
 | Embeds | `EMBED_ALLOWED_ORIGINS`: `*`, or a comma-separated list of origins |
 
-For sign-in providers, register `<your domain>/auth/callback/<google|github|microsoft|oidc>` as the callback URL. Every other variable is listed in [`.env.example`](https://github.com/bzvstudio/excalidraw-plus-community/blob/main/.env.example).
+For sign-in providers, register `<your domain>/auth/callback/<google|github|microsoft|oidc>` as the callback URL. Every other variable is listed in [`.env.example`](https://github.com/bzvstudio/excalidraw-plus-community-edition/blob/main/.env.example).
 
 **Running it.**
 
@@ -67,7 +67,7 @@ For sign-in providers, register `<your domain>/auth/callback/<google|github|micr
 - **Rotating the encryption key**: Set the new key as `ENCRYPTION_KEY` and the old one as `ENCRYPTION_KEY_PREVIOUS`, redeploy, run `node reseal.mjs` through `railway ssh`, then remove the previous key.
 - **Resetting a password without email**: Run `node reset-password-link.mjs person@example.com` through `railway ssh`.
 
-**Security and license.** Report vulnerabilities privately, as described in [SECURITY.md](https://github.com/bzvstudio/excalidraw-plus-community/blob/main/SECURITY.md). This project is MIT-licensed. The embedded Excalidraw editor is MIT-licensed too, with its notice in [THIRD_PARTY_NOTICES.md](https://github.com/bzvstudio/excalidraw-plus-community/blob/main/THIRD_PARTY_NOTICES.md). The Excalidraw name and logo belong to their owners.
+**Security and license.** Report vulnerabilities privately, as described in [SECURITY.md](https://github.com/bzvstudio/excalidraw-plus-community-edition/blob/main/SECURITY.md). This project is MIT-licensed. The embedded Excalidraw editor is MIT-licensed too, with its notice in [THIRD_PARTY_NOTICES.md](https://github.com/bzvstudio/excalidraw-plus-community-edition/blob/main/THIRD_PARTY_NOTICES.md). The Excalidraw name and logo belong to their owners.
 
 ## Why Deploy Excalidraw Plus Community Edition on Railway?
 
