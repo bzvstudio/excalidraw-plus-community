@@ -27,13 +27,14 @@ export const signInSchema = z.object({
 
 export const signUpSchema = z.object({ firstName, lastName, email, password: newPassword })
 
-export const setupSchema = signUpSchema.extend({
+export const setupCodeSchema = z.object({
   setupCode: z.string().trim().min(1, 'Enter the setup code from the server log'),
 })
 
 export type SignInValues = z.infer<typeof signInSchema>
 export type SignUpValues = z.infer<typeof signUpSchema>
-export type SetupValues = z.infer<typeof setupSchema>
+export type SetupCodeValues = z.infer<typeof setupCodeSchema>
+export type SetupValues = SignUpValues & SetupCodeValues
 
 export function toAccount({ firstName, lastName, ...rest }: SignUpValues) {
   return { ...rest, name: [firstName, lastName].filter(Boolean).join(' ') }
