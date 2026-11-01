@@ -40,6 +40,14 @@ export const workspacesRouter = router({
     .input(z.object({ userId: userIdSchema, revokeKeyIds: revokeKeyIdsSchema }))
     .mutation(({ ctx, input }) => ctx.services.workspaces.removeMember(ctx.member, input.userId, input.revokeKeyIds)),
 
+  leave: workspaceProcedure
+    .input(z.object({ transferTo: userIdSchema.optional(), revokeKeyIds: revokeKeyIdsSchema }))
+    .mutation(({ ctx, input }) =>
+      ctx.services.workspaces.leave(ctx.member, { transferTo: input.transferTo, revokeKeyIds: input.revokeKeyIds }),
+    ),
+
+  delete: workspaceProcedure.mutation(({ ctx }) => ctx.services.workspaces.delete(ctx.member)),
+
   removed: workspaceProcedure.query(({ ctx }) => ctx.services.workspaces.listRemoved(ctx.member)),
 
   readmit: workspaceProcedure

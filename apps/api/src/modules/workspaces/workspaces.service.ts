@@ -3,6 +3,7 @@ import { auditActorOf, auditEvent } from "../audit/audit.utils.js";
 import type { DrizzleTransaction } from "../../stores/database.js";
 import { store } from "../../stores/index.js";
 import type { AccessChanged } from "../access/access.type.js";
+import type { FilesService } from "../files/files.type.js";
 import { UnknownApiKey } from "../api-keys/api-keys.utils.js";
 import { assertCan, WorkspaceAccessDenied } from "../authorization/authorization.utils.js";
 import type { EmailService } from "../email/email.type.js";
@@ -18,6 +19,7 @@ import {
   isRefusedInvite,
   isUniqueViolation,
   LastAdministrator,
+  OnlyMember,
   recentWithin,
   RemovedFromWorkspace,
   HandleTaken,
@@ -39,13 +41,15 @@ export type WorkspacesServiceOptions = {
   email: EmailService;
   publicBaseUrl: string;
   productName: string;
+  files: Pick<FilesService, "removeAllOfWorkspace">;
+  log: (line: string) => void;
   accessChanged?: AccessChanged;
   now?: () => Date;
   generateToken?: () => string;
 };
 
 export function createWorkspacesService(options: WorkspacesServiceOptions): WorkspacesService {
-  const { email, publicBaseUrl, productName } = options;
+  const { email, publicBaseUrl, productName, files, log } = options;
   const accessChanged = options.accessChanged ?? (() => undefined);
   const invitesEmailedBy = new Map<string, number[]>();
   const now = options.now ?? (() => new Date());
@@ -148,6 +152,29 @@ export function createWorkspacesService(options: WorkspacesServiceOptions): Work
     const target = await store.workspaceMembers.getForUpdate(actor.workspaceId, userId, tx);
     if (!target) throw new UnknownMember();
     return { isLastAdmin: target.role === "admin" && admins.length === 1, role: target.role };
+  };
+
+  const lockWorkspace = async (workspaceId: string, tx: DrizzleTransaction) => {
+    if (!(await store.workspaces.getForUpdate(workspaceId, tx))) throw new UnknownWorkspace();
+  };
+
+  const promoteSuccessor = async (actor: Membership, userId: string, tx: DrizzleTransaction) => {
+    if (userId === actor.userId) throw new UnknownMember();
+    const target = await store.workspaceMembers.getForUpdate(actor.workspaceId, userId, tx);
+    if (!target) throw new UnknownMember();
+    if (target.role === "admin") return;
+    await store.workspaceMembers.update(actor.workspaceId, userId, { role: "admin" }, tx);
+    await store.auditEvents.add(
+      auditEvent({
+        workspaceId: actor.workspaceId,
+        action: "member.role_changed",
+        actor: auditActorOf(actor),
+        target: { kind: "user", id: userId },
+        metadata: { from: target.role, to: "admin" },
+        at: now(),
+      }),
+      tx,
+    );
   };
 
   return {
@@ -258,6 +285,52 @@ export function createWorkspacesService(options: WorkspacesServiceOptions): Work
         );
       });
       accessChanged({ workspaceId: actor.workspaceId });
+    },
+
+    leave: async (actor, { transferTo, revokeKeyIds = [] }) => {
+      const { workspaceId, userId } = actor;
+      await store.transaction(async (tx) => {
+        await lockWorkspace(workspaceId, tx);
+        const admins = await store.workspaceMembers.getAllAdminsForUpdate(workspaceId, tx);
+        const me = await store.workspaceMembers.getForUpdate(workspaceId, userId, tx);
+        if (!me) throw new UnknownWorkspace();
+        const [counted] = await store.workspaceMembers.getAllMemberCountsByWorkspaceIds([workspaceId], tx);
+        if (counted?.members === 1) throw new OnlyMember();
+        const needsAdmin = transferTo !== undefined || revokeKeyIds.length > 0;
+        if (needsAdmin && me.role !== "admin") throw new WorkspaceAccessDenied("workspace.manage");
+        if (transferTo !== undefined) await promoteSuccessor(actor, transferTo, tx);
+        else if (me.role === "admin" && admins.length === 1) throw new LastAdministrator();
+        await revokeKeysIn(actor, revokeKeyIds, tx);
+        await store.teamMembers.deleteByUserIdAndWorkspaceId(userId, workspaceId, tx);
+        await store.workspaceMembers.delete(workspaceId, userId, tx);
+        await store.auditEvents.add(
+          auditEvent({
+            workspaceId,
+            action: "member.left",
+            actor: auditActorOf(actor),
+            metadata: { role: me.role },
+            at: now(),
+          }),
+          tx,
+        );
+      });
+      accessChanged({ workspaceId });
+    },
+
+    delete: async (actor) => {
+      assertCan(actor, "workspace.manage");
+      const { workspaceId, userId } = actor;
+      await store.transaction(async (tx) => {
+        await lockWorkspace(workspaceId, tx);
+        const me = await store.workspaceMembers.getForUpdate(workspaceId, userId, tx);
+        if (me?.role !== "admin") throw new WorkspaceAccessDenied("workspace.manage");
+        await store.workspaces.delete(workspaceId, tx);
+      });
+      log(`Workspace ${workspaceId} was deleted by user ${userId}`);
+      accessChanged({ workspaceId });
+      await files.removeAllOfWorkspace(workspaceId).catch((error: unknown) => {
+        log(`Workspace ${workspaceId} was deleted, but its files were not all removed from storage: ${String(error)}`);
+      });
     },
 
     listRemoved: async (actor) => {
