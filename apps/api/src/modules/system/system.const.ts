@@ -1,4 +1,4 @@
-export const PRODUCT_NAME = "Excalidraw Plus Community";
+export const PRODUCT_NAME = "Excalidraw Plus Community Edition";
 
 export const DEFAULT_API_PORT = 3100;
 
