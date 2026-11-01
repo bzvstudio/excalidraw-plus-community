@@ -33,6 +33,12 @@ export class LastAdministrator extends Error {
   }
 }
 
+export class OnlyMember extends Error {
+  constructor() {
+    super("You are the only person in this workspace. Delete it instead of leaving.");
+  }
+}
+
 export class UnknownInvite extends Error {
   constructor() {
     super("This invite link is not valid");

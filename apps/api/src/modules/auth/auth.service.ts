@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
-import { betterAuth } from "better-auth";
-import { APIError } from "better-auth/api";
+import { type BetterAuthPlugin, betterAuth } from "better-auth";
+import { APIError, createAuthEndpoint } from "better-auth/api";
 import { genericOAuth } from "better-auth/plugins";
 import { store } from "../../stores/index.js";
 import {
@@ -14,6 +14,8 @@ import {
   OIDC_PROVIDER_ID,
   PASSWORD_RESET_VALID_SECONDS,
   RESET_PASSWORD_PATH,
+  SETUP_CODE_CHECK_PATH,
+  SETUP_CODE_CHECKS_PER_MINUTE,
   SETUP_CODE_GROUP_LENGTH,
   SETUP_CODE_GROUPS,
   SETUP_CODE_HEADER,
@@ -94,6 +96,15 @@ export function createAuthService(options: AuthServiceOptions): AuthService {
   const presentsSetupCode = (headers: Headers | undefined) =>
     setupCode !== undefined && isSetupCode(headers?.get(SETUP_CODE_HEADER) ?? "", setupCode);
 
+  const setupCodeCheck = {
+    id: "setup-code-check",
+    endpoints: {
+      checkSetupCode: createAuthEndpoint(SETUP_CODE_CHECK_PATH, { method: "POST" }, (context) =>
+        context.json({ valid: presentsSetupCode(context.headers) }),
+      ),
+    },
+  } satisfies BetterAuthPlugin;
+
   const auth = betterAuth({
     secret,
     baseURL: publicBaseUrl,
@@ -121,7 +132,11 @@ export function createAuthService(options: AuthServiceOptions): AuthService {
         );
       },
     },
-    rateLimit: { enabled: true, storage: "memory" },
+    rateLimit: {
+      enabled: true,
+      storage: "memory",
+      customRules: { [SETUP_CODE_CHECK_PATH]: { window: 60, max: SETUP_CODE_CHECKS_PER_MINUTE } },
+    },
     advanced: {
       ...cookieSettings(options.secureCookies),
       ipAddress: {
@@ -138,24 +153,27 @@ export function createAuthService(options: AuthServiceOptions): AuthService {
       ...(providers.github && { github: providers.github }),
       ...(providers.microsoft && { microsoft: { ...providers.microsoft, disableIdTokenSignIn: true } }),
     },
-    plugins: providers.oidc
-      ? [
-          genericOAuth({
-            config: [
-              {
-                providerId: OIDC_PROVIDER_ID,
-                name: providers.oidc.label,
-                discoveryUrl: `${providers.oidc.issuerUrl.replace(/\/$/, "")}/.well-known/openid-configuration`,
-                clientId: providers.oidc.clientId,
-                clientSecret: providers.oidc.clientSecret,
-                scopes: ["openid", "email", "profile"],
-                pkce: true,
-                disableProviderLogout: true,
-              },
-            ],
-          }),
-        ]
-      : [],
+    plugins: [
+      setupCodeCheck,
+      ...(providers.oidc
+        ? [
+            genericOAuth({
+              config: [
+                {
+                  providerId: OIDC_PROVIDER_ID,
+                  name: providers.oidc.label,
+                  discoveryUrl: `${providers.oidc.issuerUrl.replace(/\/$/, "")}/.well-known/openid-configuration`,
+                  clientId: providers.oidc.clientId,
+                  clientSecret: providers.oidc.clientSecret,
+                  scopes: ["openid", "email", "profile"],
+                  pkce: true,
+                  disableProviderLogout: true,
+                },
+              ],
+            }),
+          ]
+        : []),
+    ],
     databaseHooks: {
       account: {
         create: { before: async (account) => ({ data: { ...account, ...NO_PROVIDER_TOKENS } }) },

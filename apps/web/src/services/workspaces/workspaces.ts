@@ -118,6 +118,21 @@ export async function removeMember(workspaceId: string, userId: string, revokeKe
   await refreshPeople(workspaceId)
 }
 
+async function forgetWorkspace() {
+  queryClient.removeQueries({ queryKey: trpc.workspaces.bySlug.queryKey() })
+  await queryClient.invalidateQueries({ queryKey: trpc.workspaces.list.queryKey() })
+}
+
+export async function leaveWorkspace(workspaceId: string, departure: { transferTo?: string; revokeKeyIds: string[] }) {
+  await trpcClient.workspaces.leave.mutate({ workspaceId, ...departure })
+  await forgetWorkspace()
+}
+
+export async function deleteWorkspace(workspaceId: string) {
+  await trpcClient.workspaces.delete.mutate({ workspaceId })
+  await forgetWorkspace()
+}
+
 export async function revokeInvite(workspaceId: string, inviteId: string) {
   await trpcClient.workspaces.revokeInvite.mutate({ workspaceId, inviteId })
   queryClient.setQueryData(trpc.workspaces.invites.queryKey({ workspaceId }), (invites) => invites?.filter(({ id }) => id !== inviteId))

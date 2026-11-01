@@ -7,11 +7,15 @@ import { SearchIcon } from '@animateicons/react/lucide/search-icon'
 import { SettingsIcon } from '@animateicons/react/lucide/settings-icon'
 import { AnimatedIcon } from '@/components/ui/animated-icon'
 import { Link } from '@tanstack/react-router'
+import { ChevronRightIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { SettingsNav } from '@/components/settings/settings-nav'
 import { Button } from '@/components/ui/button'
 import { Kbd } from '@/components/ui/kbd'
+import type { SettingsPageId } from '@/constants/settings'
 import { activityLink, placeLink, settingsLink, workspaceLink } from '@/helpers/places'
 import type { ThemePreference } from '@/hooks/use-theme'
+import { cn } from '@/lib/utils'
 import { DRAFTS } from '@repo/api/scenes.const'
 import { type CollectionActions, CollectionsNav } from './collections-nav'
 import { SIDEBAR_ROW } from './sidebar-styles'
@@ -73,7 +77,7 @@ export function AppSidebar({
           </Button>
         )}
       </div>
-      <div className="flex min-h-0 flex-1 flex-col gap-4">{children}</div>
+      <div className="-mx-1 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-1">{children}</div>
       <UserMenu
         principal={principal}
         themePreference={themePreference}
@@ -87,20 +91,25 @@ export function AppSidebar({
 
 export function WorkspaceNav({
   workspaceSlug,
+  isAdmin,
+  currentSettingsPage,
   collections,
   collectionActions,
   collectionsOpen,
   onCollectionsOpenChange,
 }: {
   workspaceSlug: string
+  isAdmin: boolean
+  currentSettingsPage: SettingsPageId | undefined
   collections: Parameters<typeof CollectionsNav>[0]['collections']
   collectionActions?: CollectionActions
   collectionsOpen: boolean
   onCollectionsOpenChange: (open: boolean) => void
 }) {
+  const settingsOpen = currentSettingsPage !== undefined
   return (
     <>
-      <nav aria-label="Workspace pages" className="flex flex-col gap-px">
+      <nav aria-label="Workspace pages" className="flex shrink-0 flex-col gap-px">
         <Link {...workspaceLink(workspaceSlug)} activeOptions={{ exact: true }} className={SIDEBAR_ROW}>
           <AnimatedIcon icon={HouseIcon} />
           Home
@@ -113,10 +122,19 @@ export function WorkspaceNav({
           <AnimatedIcon icon={ActivityIcon} />
           Activity
         </Link>
-        <Link {...settingsLink(workspaceSlug)} className={SIDEBAR_ROW}>
+        <Link
+          {...settingsLink(workspaceSlug)}
+          activeOptions={{ exact: true }}
+          className={cn(SIDEBAR_ROW, settingsOpen && 'font-medium text-foreground data-[status=active]:not-hover:bg-transparent')}
+        >
           <AnimatedIcon icon={SettingsIcon} />
-          Settings
+          <span className="min-w-0 flex-1 truncate">Settings</span>
+          <ChevronRightIcon
+            aria-hidden
+            className={cn('size-3.5 shrink-0 transition-transform duration-200 ease-out motion-reduce:transition-none', settingsOpen && 'rotate-90')}
+          />
         </Link>
+        <SettingsNav workspaceSlug={workspaceSlug} isAdmin={isAdmin} current={currentSettingsPage} />
       </nav>
       <CollectionsNav
         workspaceSlug={workspaceSlug}

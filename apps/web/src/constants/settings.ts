@@ -30,7 +30,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
   {
     id: 'general',
     label: 'General',
-    description: 'The workspace’s name and how its scenes may be shared.',
+    description: 'The workspace’s name, how its scenes may be shared, and leaving or deleting it.',
     group: 'workspace',
     adminOnly: false,
   },

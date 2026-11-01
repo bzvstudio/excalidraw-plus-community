@@ -32,6 +32,7 @@ export type FilesService = {
   putShared: (grant: SceneGrant, fileId: string, bytes: Buffer) => Promise<{ stored: boolean }>;
   getShared: (grant: SceneGrant, fileId: string) => Promise<StoredFile>;
   removeAllOf: (workspaceId: string, sceneId: string) => Promise<void>;
+  removeAllOfWorkspace: (workspaceId: string) => Promise<void>;
   resealNext: (limit: number) => Promise<number>;
   missingFromStorage: { start: () => void; found: () => readonly string[] };
 };

@@ -16,7 +16,7 @@ export function Logo({ name, className }: { name: string; className?: string }) 
   return (
     <span className={cn('inline-flex items-center gap-2 text-base font-semibold tracking-tight text-foreground', className)}>
       <LogoMark />
-      <span className="truncate">{name}</span>
+      <span className="min-w-0 text-balance">{name}</span>
     </span>
   )
 }

@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -5,23 +6,39 @@ import { PhotoButtons } from '@/components/settings/photo-buttons'
 import { SettingsCard, SettingsHeading, SettingsNote, SettingsRow, SettingsStack } from '@/components/settings/settings-section'
 import { Avatar } from '@/components/ui/avatar'
 import { Switch } from '@/components/ui/switch'
+import { WorkspaceDangerZone } from '@/components/workspaces/workspace-danger-zone'
+import { HOME_PATH } from '@/constants/routes'
 import { attempt } from '@/helpers/results'
 import { canManageWorkspace } from '@/helpers/roles'
 import { settingsPage } from '@/helpers/settings-pages'
 import { useWorkspace } from '@/hooks/use-workspace'
 import { avatarImage, removeWorkspaceAvatar, uploadWorkspaceAvatar } from '@/services/avatars/avatars'
-import { updateWorkspaceSettings } from '@/services/workspaces/workspaces'
+import { deleteWorkspace, leaveWorkspace, updateWorkspaceSettings } from '@/services/workspaces/workspaces'
+import { trpc } from '@/trpc'
+import type { ApiKeyItem, WorkspaceMember } from '@/types/api'
 import type { SubmitResult } from '@/types/forms'
 
 const PAGE = settingsPage('general')
 
 export function WorkspaceSettingsRoute() {
   const router = useRouter()
-  const { workspace } = useWorkspace()
+  const { principal, workspace } = useWorkspace()
   const [saving, setSaving] = useState(false)
+  const canManage = canManageWorkspace(workspace.role)
+  const membersQuery = useQuery(trpc.workspaces.members.queryOptions({ workspaceId: workspace.id }))
+  const apiKeysQuery = useQuery({ ...trpc.apiKeys.list.queryOptions({ workspaceId: workspace.id }), enabled: canManage })
 
   const refreshing = async (result: SubmitResult) => {
     if (!result.error) await router.invalidate()
+    return result
+  }
+
+  const departing = async (run: () => Promise<void>, message: string) => {
+    const result = await attempt(run)
+    if (!result.error) {
+      toast(message)
+      await router.navigate({ href: HOME_PATH, replace: true })
+    }
     return result
   }
 
@@ -32,7 +49,10 @@ export function WorkspaceSettingsRoute() {
       avatarId={workspace.avatarId}
       address={`${window.location.host}/${workspace.slug}`}
       guestEditLinks={workspace.guestEditLinks}
-      canManage={canManageWorkspace(workspace.role)}
+      canManage={canManage}
+      currentUserId={principal.userId}
+      members={membersQuery.data ?? (membersQuery.isError ? 'failed' : 'loading')}
+      apiKeys={canManage ? (apiKeysQuery.data ?? (apiKeysQuery.isError ? 'failed' : 'loading')) : []}
       saving={saving}
       onChange={async (guestEditLinks) => {
         setSaving(true)
@@ -44,6 +64,8 @@ export function WorkspaceSettingsRoute() {
       }}
       onUploadPhoto={async (file) => refreshing(await uploadWorkspaceAvatar(workspace.id, file))}
       onRemovePhoto={async () => refreshing(await removeWorkspaceAvatar(workspace.id))}
+      onLeave={(departure) => departing(() => leaveWorkspace(workspace.id, departure), `You left ${workspace.name}`)}
+      onDelete={() => departing(() => deleteWorkspace(workspace.id), `Deleted ${workspace.name}`)}
     />
   )
 }
@@ -55,10 +77,15 @@ export function WorkspaceSettingsPage({
   address,
   guestEditLinks,
   canManage,
+  currentUserId,
+  members,
+  apiKeys,
   saving = false,
   onChange,
   onUploadPhoto,
   onRemovePhoto,
+  onLeave,
+  onDelete,
 }: {
   workspaceId: string
   workspaceName: string
@@ -66,10 +93,15 @@ export function WorkspaceSettingsPage({
   address: string
   guestEditLinks: boolean
   canManage: boolean
+  currentUserId: string
+  members: WorkspaceMember[] | 'loading' | 'failed'
+  apiKeys: ApiKeyItem[] | 'loading' | 'failed'
   saving?: boolean
   onChange: (guestEditLinks: boolean) => void
   onUploadPhoto: (file: File) => Promise<SubmitResult>
   onRemovePhoto: () => Promise<SubmitResult>
+  onLeave: (departure: { transferTo?: string; revokeKeyIds: string[] }) => Promise<SubmitResult>
+  onDelete: () => Promise<SubmitResult>
 }) {
   const [photoError, setPhotoError] = useState<string>()
   const photo = avatarImage(avatarId)
@@ -131,6 +163,15 @@ export function WorkspaceSettingsPage({
           </SettingsCard>
           {!canManage && <SettingsNote>Only admins can change how scenes are shared.</SettingsNote>}
         </div>
+        <WorkspaceDangerZone
+          workspaceName={workspaceName}
+          canManage={canManage}
+          currentUserId={currentUserId}
+          members={members}
+          apiKeys={apiKeys}
+          onLeave={onLeave}
+          onDelete={onDelete}
+        />
       </SettingsStack>
     </>
   )

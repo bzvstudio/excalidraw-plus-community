@@ -146,6 +146,8 @@ export function createContainer(env: Env, overrides: ContainerOverrides = {}): C
     email,
     publicBaseUrl: env.PUBLIC_BASE_URL,
     productName: PRODUCT_NAME,
+    files,
+    log: (line) => console.error(line),
     accessChanged,
   });
   const secureCookies = env.PUBLIC_BASE_URL.startsWith("https://");
