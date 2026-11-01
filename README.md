@@ -1,6 +1,6 @@
 # Deploy and Host Excalidraw Plus Community Edition with Railway
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/FvekVi?referralCode=1uJ_oA)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/excalidraw-plus-community-edition?referralCode=1uJ_oA)
 
 > **Community Edition.** This is an independent, community-built project inspired by Excalidraw+. It is not affiliated with, endorsed by or supported by Excalidraw. If you need a robust, secure product with compliance such as SOC 2, we recommend the official [Excalidraw+](https://plus.excalidraw.com).
 
@@ -61,7 +61,7 @@ For sign-in providers, register `<your domain>/auth/callback/<google|github|micr
 
 **Running it.**
 
-- **Custom domain**: Set `PUBLIC_BASE_URL` to it as well. The app answers on one address.
+- **Custom domain**: After adding it, check that `PUBLIC_BASE_URL` shows the new address, set it if not, then redeploy. The app answers on one address and reads it at startup, so until the redeploy, sign-up and sign-in fail with *Invalid origin*.
 - **One replica**: Live collaboration keeps each open scene's room in memory, so do not scale the app beyond one replica.
 - **Upgrades**: The service follows the `1` image tag. Use the update button in the service's settings, or turn on auto updates under **Settings → Source**.
 - **Rotating the encryption key**: Set the new key as `ENCRYPTION_KEY` and the old one as `ENCRYPTION_KEY_PREVIOUS`, redeploy, run `node reseal.mjs` through `railway ssh`, then remove the previous key.
