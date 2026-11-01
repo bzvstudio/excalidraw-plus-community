@@ -80,7 +80,7 @@ export function MyWorkspacesPage({ workspaces, currentId }: { workspaces: Worksp
           )
         })}
       </ul>
-      <SettingsNote>To leave a workspace, ask one of its admins to remove you.</SettingsNote>
+      <SettingsNote>To leave a workspace, open its settings.</SettingsNote>
     </>
   )
 }

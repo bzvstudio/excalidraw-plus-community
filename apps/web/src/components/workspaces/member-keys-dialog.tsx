@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { type ReactNode, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -18,6 +18,9 @@ export function MemberKeysDialog({
   consequence,
   action,
   keys,
+  self = false,
+  ready = true,
+  children,
   onClose,
   onConfirm,
 }: {
@@ -25,9 +28,13 @@ export function MemberKeysDialog({
   consequence: string
   action: string
   keys: ApiKeyItem[] | 'loading' | 'failed'
+  self?: boolean
+  ready?: boolean
+  children?: ReactNode
   onClose: () => void
   onConfirm: (revokeKeyIds: string[]) => Promise<SubmitResult>
 }) {
+  const they = self ? 'you' : 'they'
   const listed = Array.isArray(keys) ? keys : []
   const [unticked, setUnticked] = useState<ReadonlySet<string>>(new Set())
   const [busy, setBusy] = useState(false)
@@ -60,18 +67,19 @@ export function MemberKeysDialog({
             <AlertDialogDescription>
               {consequence}
               {listed.length > 0 &&
-                ' Keys they made belong to the workspace and keep working after they go, so revoke any they might still hold.'}
+                ` Keys ${they} made belong to the workspace and keep working after ${they} go, so revoke any ${they} might still hold.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          {keys === 'loading' && <p className="text-sm text-muted-foreground">Checking for API keys they made…</p>}
+          {children}
+          {keys === 'loading' && <p className="text-sm text-muted-foreground">Checking for API keys {they} made…</p>}
           {keys === 'failed' && (
             <p role="alert" className="text-sm text-destructive">
-              Their API keys couldn’t be loaded. Close this and try again, or look under Settings › API keys.
+              {self ? 'Your' : 'Their'} API keys couldn’t be loaded. Close this and try again, or look under Settings › API keys.
             </p>
           )}
           {listed.length > 0 && (
               <fieldset className="flex flex-col gap-2">
-                <legend className="mb-1 text-sm font-medium">Revoke keys they made</legend>
+                <legend className="mb-1 text-sm font-medium">Revoke keys {they} made</legend>
                 {listed.map((key) => (
                   <label key={key.id} className="flex items-center gap-2 text-sm">
                     <Checkbox
@@ -95,7 +103,7 @@ export function MemberKeysDialog({
             <Button type="button" variant="outline" onClick={onClose} disabled={busy}>
               Cancel
             </Button>
-            <Button type="submit" variant="destructive" disabled={busy || !Array.isArray(keys)}>
+            <Button type="submit" variant="destructive" disabled={busy || !ready || !Array.isArray(keys)}>
               {revoking.length > 0 ? `${action} and revoke ${revoking.length === 1 ? '1 key' : `${revoking.length} keys`}` : action}
             </Button>
           </AlertDialogFooter>

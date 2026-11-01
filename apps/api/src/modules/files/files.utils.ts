@@ -34,8 +34,12 @@ export function sniffImageType(bytes: Buffer): FileMimeType | undefined {
   return SVG_START.test(bytes.subarray(0, SVG_SNIFF_BYTES).toString("utf8")) ? "image/svg+xml" : undefined;
 }
 
+export function workspaceFilesPrefix(workspaceId: string): string {
+  return `workspaces/${workspaceId}/`;
+}
+
 export function sceneFilesPrefix(workspaceId: string, sceneId: string): string {
-  return `workspaces/${workspaceId}/scenes/${sceneId}/files/`;
+  return `${workspaceFilesPrefix(workspaceId)}scenes/${sceneId}/files/`;
 }
 
 export function fileKey(workspaceId: string, sceneId: string, fileId: string): string {
