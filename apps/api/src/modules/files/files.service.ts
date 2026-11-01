@@ -15,6 +15,7 @@ import {
   sceneFilesPrefix,
   sniffImageType,
   UnknownFile,
+  workspaceFilesPrefix,
 } from "./files.utils.js";
 
 export function createFilesService(options: {
@@ -108,6 +109,8 @@ export function createFilesService(options: {
     getShared: (grant, fileId) => read(grant.workspaceId, grant.sceneId, fileId),
 
     removeAllOf: (workspaceId, sceneId) => storage.deleteAll(sceneFilesPrefix(workspaceId, sceneId)),
+
+    removeAllOfWorkspace: (workspaceId) => storage.deleteAll(workspaceFilesPrefix(workspaceId)),
 
     resealNext: async (limit) => {
       const candidates = await store.sceneFiles.getAllNotSealedWith(sealer.currentKeyId, limit + missing.size);

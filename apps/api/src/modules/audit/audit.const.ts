@@ -6,6 +6,7 @@ export const AUDIT_CATALOGUE = {
   "member.joined": ["role"],
   "member.role_changed": ["from", "to"],
   "member.removed": ["role"],
+  "member.left": ["role"],
   "member.readmitted": [],
   "share_link.created": ["role", "validForDays"],
   "share_link.revoked": ["role"],

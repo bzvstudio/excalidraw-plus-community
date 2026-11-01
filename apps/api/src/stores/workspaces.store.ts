@@ -34,4 +34,8 @@ export const workspacesStore = {
 
     return rows.at(0);
   },
+
+  delete: async (id: string, db: Executor = global.db) => {
+    await db.delete(workspaces).where(eq(workspaces.id, id));
+  },
 };
